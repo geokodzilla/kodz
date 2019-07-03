@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from kodz.src.file_reader import FileReader
+from collections import Counter
 
 
 class Analiza(object):
@@ -51,14 +52,61 @@ class Analiza(object):
 			pkt_set.add(pkt_dict[p_uz].get_coords_str())
 		return pkt_set
 
+	def _err_to_file(self, filename, data):
+		err_file = open(filename, 'w')
+		for i in data:
+			print(i, file=err_file)
+
 	def removable_points(self, uzytek):
 		set_kontury_pkt = self._pkt_coords_set_uzytki(self.punkty_kontury_dict, self.kontury_lista, uzytek=uzytek)
 		set_dzialki_pkt = self._pkt_coords_set(self.dzialki_lista)
-		err_file = open('./Błędy_kontury.txt', 'w')
 		# roznica pkt_konturów z dzialkami daje nam pkt konturów należące w tym konkretnym przypadku do dróg w których brak jest pkt granicznego działki
-		for i in set_kontury_pkt - set_dzialki_pkt:
-			print(i, file=err_file)
+		data = set_kontury_pkt - set_dzialki_pkt
+		self._err_to_file('./Błedy_kontury.txt', data)
+		return data
 
-				
+	def _kon_to_merge(self):
+		"""
+		Tworzy listę konturów które mogą podlegać połączeniu
+		:return:
+		"""
+		kon_to_merge = []
+		for pktk, kon in self.punkty_kontury_dict.items():
+			konl = list(kon)
+			for nr, ozn in enumerate(konl):
+				ozn_short = ozn[0:ozn.index('-') + 1] + ozn[ozn.index('/') + 1:]
+				konl[nr] = [ozn_short, ozn]
+			c = Counter([i[0] for i in konl])
+			for ozn_s, counter in c.items():
+				row = []
+				if counter > 1:
+					for i in konl:
+						if i[0] == ozn_s:
+							row.append(i[1])
+				if len(row) > 0 and row not in kon_to_merge: kon_to_merge.append(row)
+		return kon_to_merge
+
+	def merge_polygons(self):
+		"""
+		Metoda wskazuje miesjca w których stykają się kontury z tego samego obrębu
+		o tych samych oznaczeniach
+		:return:
+		"""
+		#TODO dodać użytki ignorowane, np.rowy, drogi
+		data = set([])
+		kon_dict = self._quick_dict(self.kontury_lista)
+		for i in self._kon_to_merge():
+			if len(i) == 2:
+				k1 = kon_dict[i[0]]
+				k2 = kon_dict[i[1]]
+				k1_pkt = {p.get_coords_str() for p in k1.punkty}
+				k2_pkt = {p.get_coords_str() for p in k2.punkty}
+				intersection = k1_pkt & k2_pkt
+				if len(intersection) > 1:
+					for i in intersection:
+						data.add(i)
+		self._err_to_file('./Błedy_kontury_styki.txt', data)
+		return data
 if __name__ == "__main__":
-	pass
+	analiza = Analiza('f:/PROGRAMOWANIE/PROJEKTY/ewmapa/Dzialki.edz', 'f:/PROGRAMOWANIE/PROJEKTY/ewmapa/Kontury.edz')
+	analiza.merge_polygons()

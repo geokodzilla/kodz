@@ -26,3 +26,16 @@ def test_pkt_coords_set_uzytki(analiza):
     assert analiza._pkt_coords_set_uzytki(kon_dict, kon_list) == {'5583805.13 7553913.68',
                                                                   '5583778.17 7553893.26',
                                                                   '5583812.71 7553918.92'}
+
+
+def test_removable_points(analiza):
+    assert analiza.removable_points('dr') == {'5583805.13 7553913.68'}
+
+
+def test_kon_to_merge(analiza):
+    assert '5-2268/B' in analiza._kon_to_merge()[0]
+    assert '5-2267/B' in analiza._kon_to_merge()[0]
+
+
+def test_merge_polygons(analiza):
+    assert analiza.merge_polygons() == {'5583776.80 7553947.08', '5583794.70 7553906.38'}
