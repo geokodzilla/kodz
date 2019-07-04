@@ -2,6 +2,10 @@
 
 from kodz.src.file_reader import FileReader
 from collections import Counter
+import logging
+
+logging.basicConfig(filename='analizy.log', filemode='w',
+					format='%(name)s - %(levelname)s - %(message)s')
 
 
 class Analiza(object):
@@ -13,6 +17,7 @@ class Analiza(object):
 		self.file_reader_kon = FileReader(self.kon_filename)
 		self.dzialki_lista, self.punkty_dzialki_dict = self.file_reader_dz.edz_file_process()
 		self.kontury_lista, self.punkty_kontury_dict = self.file_reader_kon.edz_file_process()
+
 
 	def _pkt_coords_set(self, dzialki_lista):
 		"""
@@ -76,9 +81,9 @@ class Analiza(object):
 			for nr, ozn in enumerate(konl):
 				try:
 					ozn_short = ozn[0:ozn.index('-') + 1] + ozn[ozn.index('/') + 1:]
+					konl[nr] = [ozn_short, ozn]
 				except ValueError:
-					print(ozn) #TODO to powinno trafić do logów
-				konl[nr] = [ozn_short, ozn]
+					logging.warning('Błędne oznaczenie konturu - %s' % ozn)
 			c = Counter([i[0] for i in konl])
 			for ozn_s, counter in c.items():
 				row = []
