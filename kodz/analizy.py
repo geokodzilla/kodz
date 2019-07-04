@@ -74,7 +74,10 @@ class Analiza(object):
 		for pktk, kon in self.punkty_kontury_dict.items():
 			konl = list(kon)
 			for nr, ozn in enumerate(konl):
-				ozn_short = ozn[0:ozn.index('-') + 1] + ozn[ozn.index('/') + 1:]
+				try:
+					ozn_short = ozn[0:ozn.index('-') + 1] + ozn[ozn.index('/') + 1:]
+				except ValueError:
+					print(ozn) #TODO to powinno trafić do logów
 				konl[nr] = [ozn_short, ozn]
 			c = Counter([i[0] for i in konl])
 			for ozn_s, counter in c.items():
