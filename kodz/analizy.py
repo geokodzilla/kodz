@@ -18,7 +18,6 @@ class Analiza(object):
 		self.dzialki_lista, self.punkty_dzialki_dict = self.file_reader_dz.edz_file_process()
 		self.kontury_lista, self.punkty_kontury_dict = self.file_reader_kon.edz_file_process()
 
-
 	def _pkt_coords_set(self, dzialki_lista):
 		"""
 		na podstawie listy dzialek tworzy zbior wspolrzednych wszystkich punktów
@@ -94,16 +93,35 @@ class Analiza(object):
 				if len(row) > 0 and row not in kon_to_merge: kon_to_merge.append(row)
 		return kon_to_merge
 
-	def merge_polygons(self):
+	def _ignore_kon(self, data, ignorowane):
+		"""
+		W anzlizie sytkow umożliwia ignorowanie pewnych konturów określonych
+		przez użytkownika, najcześciej dotyczy to uzytków dr.
+		:param data:
+		:param ignorowane:
+		:return:
+		"""
+		remove = set([])
+		for nr, row in enumerate(data):
+			for i in ignorowane:
+				for ozn in row:
+					if i in ozn:
+						remove.add(nr)
+		for i in list(remove)[::-1]:
+			data.pop(i)
+		return data
+
+	def merge_polygons(self, ignorowane=None):
 		"""
 		Metoda wskazuje miesjca w których stykają się kontury z tego samego obrębu
 		o tych samych oznaczeniach
 		:return:
 		"""
-		#TODO dodać użytki ignorowane, np.rowy, drogi
+		if ignorowane is None: ignorowane = []
 		data = set([])
 		kon_dict = self._quick_dict(self.kontury_lista)
-		for i in self._kon_to_merge():
+		data_kon = self._kon_to_merge()
+		for i in self._ignore_kon(data_kon, ignorowane):
 			if len(i) == 2:
 				k1 = kon_dict[i[0]]
 				k2 = kon_dict[i[1]]
@@ -117,4 +135,4 @@ class Analiza(object):
 		return data
 if __name__ == "__main__":
 	analiza = Analiza('f:/PROGRAMOWANIE/PROJEKTY/ewmapa/Dzialki.edz', 'f:/PROGRAMOWANIE/PROJEKTY/ewmapa/Kontury.edz')
-	analiza.merge_polygons()
+	analiza.merge_polygons(ignorowane=['dr'])

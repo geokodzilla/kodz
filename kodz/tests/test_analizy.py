@@ -37,5 +37,10 @@ def test_kon_to_merge(analiza):
     assert '5-2267/B' in analiza._kon_to_merge()[0]
 
 
+def test_ignore_kon(analiza):
+    in_data = [['1-100/dr', '1-101/dr'], ['5-231/B', '5-321/B'], ['2-145/W-PsV', '2-563/W-PsV']]
+    assert analiza._ignore_kon(in_data, ['dr', 'W-']) == [['5-231/B', '5-321/B']]
+
+
 def test_merge_polygons(analiza):
     assert analiza.merge_polygons() == {'5583776.80 7553947.08', '5583794.70 7553906.38'}
