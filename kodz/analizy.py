@@ -107,6 +107,8 @@ class Analiza(object):
 				for ozn in row:
 					if i in ozn:
 						remove.add(nr)
+		remove = list(remove)
+		remove.sort() # sortowanie ignorowanych indeksów
 		for i in list(remove)[::-1]:
 			data.pop(i)
 		return data
