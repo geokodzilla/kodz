@@ -8,7 +8,7 @@ class FileReader(object):
     def __init__(self, filename):
         self.filename = filename
 
-    def file_reader(self):
+    def _file_reader(self):
         """
         funkcja wczytująca dane z plików tekstowych
         """
@@ -24,7 +24,7 @@ class FileReader(object):
         """
         dzialki = []
         punkty = defaultdict(set)
-        edz_data = self.file_reader()
+        edz_data = self._file_reader()
         for row in edz_data:
             if len(row) == 1 and '-' in row[0]:
                 dz = Dzialka(numer=row[0])

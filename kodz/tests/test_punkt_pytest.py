@@ -9,10 +9,10 @@ def simple_point():
 	return Punkt(numer='1')
 
 
-def test_get_coords_str(simple_point):
-	assert simple_point.get_coords_str() == '0.0 0.0'
+def test_str(simple_point):
+	assert str(simple_point) == '0.0 0.0'
 	simple_point.set_coords('101.23', '205.32')
-	assert simple_point.get_coords_str() == '101.23 205.32'
+	assert str(simple_point) == '101.23 205.32'
 
 
 def test_set_x(simple_point):

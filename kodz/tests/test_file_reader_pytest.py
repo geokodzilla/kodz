@@ -9,7 +9,7 @@ def plik():
 
 
 def test_file_reader(plik):
-    data = plik.file_reader()
+    data = plik._file_reader()
     assert len(data) == 341
     assert data[0] == ['5-844']
     assert data[-1] == ['5-7808', '5582354.78', '7553073.03', '5582354.78', '7553073.03',
